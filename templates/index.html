@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRUD Application</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .modal-body{
+            background-color: white !important;
+        }
+
+        .modal.in .modal-dialog {
+            background-color: lightgray;
+        }
+    </style>
+
+
+</head>
+<body>
+
+{% block body %}
+
+    <div class="container">
+         <div class="well text-center">
+             <h1>Clients Web Application</h1>
+         </div>
+    </div>
+
+<div class="container">
+    <div class="row">
+        <div class="col md-12">
+            <h2>Client List <button type="button" class="btn btn-success pull-right" data-toggle="modal" data-target="#mymodal">Add Client Data</button></h2>
+
+            <!--this is needed to display a flash message when the user has inputted the data-->
+            {%with messages = get_flashed_messages()%} <!--this is a built-in function within flask-->
+            {%if messages%}
+            {%for message in messages%}
+            <!--this is the bootstrap style for the flash message that is needed to show the user that their data has been inputted-->
+            <div class="alert alert-success alert-dismissable" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="close">
+
+                    <span aria-hidden="true">X</span>
+                </button>
+                {{message}}
+            </div>
+
+            {%endfor%}
+            {%endif%}
+            {%endwith%}
+
+            <table class="table table-striped">
+
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Address</th>
+                    <th>Date</th>
+                    <th>Invoice Number</th>
+                    <th>Description</th>
+                    <th>Invoice Totals</th>
+                    <th>Action</th>
+                </tr>
+                <!--this is how i update the web page with the data from the clients table-->
+                {% for row in clients %}
+                <tr>
+                    <td>{{row.0}}</td> <!--the row.0 refers to the row that the ID is in within the table-->
+                    <td>{{row.1}}</td>
+                    <td>{{row.2}}</td>
+                    <td>{{row.3}}</td>
+                    <td>{{row.4}}</td>
+                    <td>{{row.5}}</td>
+                    <td>{{row.6}}</td>
+
+                    <td>
+                        <a href="/update/{{row.0}}" class="btn btn-warning btn-xs" data-toggle="modal" data-target="#modaledit{{row.0}}">Edit</a>
+                        <a href="/delete/{{row.0}}" class="btn btn-danger btn-xs" onclick="return confirm('Are you sure you want to delete')">Delete</a>
+                        <!--these are the buttons for delete edit and in the href it is there so you get directed to the appropriate location-->
+                    </td>
+                </tr>
+<!--what this does from this line until the end of for loop is what is needed for the edit button to be able to show the current information in the database-->
+                <div id="modaledit{{row.0}}" class="modal fade" role="dialog">
+
+       <div class="modal-dialog">
+
+
+      <div class="modal-content">
+
+
+         <div class="modal-header">
+
+
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+
+
+            <h4 class="modal-title">Please Update Data</h4>
+
+
+         </div>
+
+
+         <div class="modal-body">
+
+
+            <form action="{{url_for('update')}}" method="POST">
+
+               <div class="form-group">
+
+                  <label>Name:</label>
+                   <input type="hidden"  name="id" value="{{row.0}}">
+
+                  <input type="text" class="form-control" name="name" value="{{row.1}}">
+
+               </div>
+
+               <div class="form-group">
+
+                  <label>Address:</label>
+
+                  <input type="text" class="form-control" name="address" value="{{row.2}}">
+
+               </div>
+
+               <div class="form-group">
+
+                  <label>Date:</label>
+
+                  <input type="date" class="form-control" name="date" value="{{row.3}}">
+
+               </div>
+
+                <div class="form-group">
+
+                  <label>Invoice Number:</label>
+
+                  <input type="number" class="form-control" name="invoicenumber" value="{{row.4}}">
+
+               </div>
+
+                <div class="form-group">
+
+                  <label>Description:</label>
+
+                  <input type="text" class="form-control" name="description" value="{{row.5}}">
+
+               </div>
+
+                <div class="form-group">
+
+                  <label>Invoice Total:</label>
+
+                  <input type="number" class="form-control" name="invoicetotals" value="{{row.6}}">
+
+               </div>
+
+               <div class="form-group">
+
+                  <button class="btn btn-primary" type="submit">Update Data</button>
+
+               </div>
+
+                 <div class="form-group">
+
+                  <button class="btn btn-primary" type="reset">Reset</button>
+
+               </div>
+
+            </form>
+
+         </div>
+
+         <div class="modal-footer">
+
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+
+         </div>
+
+      </div>
+
+   </div>
+
+</div>
+
+                {%endfor%}
+
+
+            </table>
+
+    </div>
+
+    </div>
+    <!--the code below is the code needed to create the form for the edit button
+    this would be the exact same as the create new button however the only difference
+    is that the edit button would not need all the fields to be required-->
+
+    <div id="modaledit" class="modal fade" role="dialog">
+
+        <div class="modal-dialog">
+
+            <div class="modal-header">
+
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+
+                <h4 class="modal-title">Please Update Data</h4>
+
+            </div>
+
+            <div class="modal-body">
+
+                <form action="" method="POST">
+
+                    <div class="form-group">
+
+                        <label>Name:</label>
+                        <input type="text" class="form-control" name="name" value="Michael">
+                    </div>
+
+                    <div class="form-group">
+
+                        <label>Address:</label>
+                        <input type="text" class="form-control" name="Address" value="180 Nothing Street">
+                    </div>
+
+                      <div class="form-group">
+
+                        <label>Date:</label>
+                        <input type="date" class="form-control" name="Date" value="2022-02-04">
+                    </div>
+
+                    <div class="form-group">
+
+                        <label>Invoice Number:</label>
+                        <input type="number" class="form-control" name="InvoiceNumber" value="12345">
+                    </div>
+
+                    <div class="form-group">
+
+                        <label>Description:</label>
+                        <input type="text" class="form-control" name="Description" value="hello world">
+                    </div>
+
+                    <div class="form-group">
+
+                        <label>Invoice Total:</label>
+                        <input type="number" class="form-control" name="InvoiceTotal" value="54321">
+                    </div>
+
+                    <div class="form-group">
+
+                        <button class="btn btn-primary" type="submit">Edit Data</button>
+                    </div>
+
+                    <div class="form-group">
+
+                        <button class="btn btn-primary" type="reset">Reset</button>
+                    </div>
+
+                </form>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- these are the functions needed for the add new client button-->
+    <div id="mymodal" class="modal fade" role="dialog">
+
+        <div class="modal-dialog">
+
+            <div class="modal-header">
+
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+
+                <h4 class="modal-title">Please Insert Data</h4>
+
+            </div>
+
+            <div class="modal-body">
+
+                <form action="{{url_for('insert')}}" method="POST">
+
+                    <div class="form-group">
+
+                        <label>Name:</label>
+                        <input type="text" class="form-control" name="name" required="1">
+                    </div>
+
+                    <div class="form-group">
+
+                        <label>Address:</label>
+                        <input type="text" class="form-control" name="address" required="1">
+                    </div>
+
+                    <div class="form-group">
+
+                          <label>Date:</label>
+                        <input type="date" class="form-control" name="date" required="1">
+                    </div>
+
+                    <div class="form-group">
+
+                        <label>Invoice Number:</label>
+                        <input type="number" class="form-control" name="invoicenumber" required="1">
+                    </div>
+
+                    <div class="form-group">
+
+                        <label>Description:</label>
+                        <input type="text" class="form-control" name="description" required="1">
+                    </div>
+
+                    <div class="form-group">
+
+                        <label>Invoice Total:</label>
+                        <input type="number" class="form-control" name="invoicetotals" required="1">
+                    </div>
+
+                    <div class="form-group">
+
+                        <button class="btn btn-primary" type="submit">Insert Data</button>
+                    </div>
+
+                    <div class="form-group">
+
+                        <button class="btn btn-primary" type="reset">Reset</button>
+                    </div>
+
+                </form>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}
+
+
+
+
+</body>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+</html>
